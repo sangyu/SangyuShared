@@ -1,0 +1,5 @@
+2018-06-09
+
+round 1 OCT with original setting. large bias towards left
+
+changed MFC settings to bring carrier air right to 1.5. left carrier to 1.6

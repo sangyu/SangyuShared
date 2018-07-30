@@ -1,0 +1,147 @@
+Sequence duration,Step type,Attribute,Action,Comment,Frame Number,Frame timer (ms),Step completion time
+14:17:00.0,Start Sequence,,,,,,
+00:00:00.2,Plugin,Opto LED,All Off,,126031,4854486,14:17:00.374
+00:00:00.2,Plugin,Mutli-Fly Tracker,LOG Off,Check counter logging is off,126031,4854486,14:17:00.374
+00:00:00.2,Plugin,Mutli-Fly Tracker,LOG Close,Check no log file open,126031,4854486,14:17:00.374
+00:00:00.2,Video In,,Start Video Input,,126031,4854486,14:17:00.374
+00:00:00.2,Plugin,Mutli-Fly Tracker,RESET,Reset Backgrounds,126031,4854486,14:17:00.374
+00:00:00.2,Plugin,Mutli-Fly Tracker,PROC On,Start Counter processing,126031,4854486,14:17:00.374
+00:00:00.2,Plugin,Mutli-Fly Tracker,LOG Open,Open new Count log file,126031,4854486,14:17:00.374
+00:00:00.2,Plugin,Mutli-Fly Tracker,LOG On,Start continuous logging,126031,4854486,14:17:00.374
+00:00:00.2,Plugin,Opto LED,3.4V - 1.67mW,,126031,4854486,14:17:00.374
+00:00:00.2,Subroutine,Wakeup,Iterations = 1,,126031,4854486,14:17:00.375
+00:00:00.2,Digital Output,Left odour shutoff,ON,,126031,4854486,14:17:00.376
+00:00:00.2,Digital Output,Right odour shutoff,ON,,126031,4854486,14:17:00.377
+00:00:05.0,Wait,5.00 sec,Delay,,126153,4859169,14:17:05.077
+00:00:05.0,Subroutine,Left RIght Puff,Iterations = 4,,126153,4859169,14:17:05.077
+00:00:05.0,Digital Output,Left airpuff,ON,,126153,4859169,14:17:05.078
+00:00:05.1,Wait,0.10 sec,Delay,,126156,4859284,14:17:05.179
+00:00:05.1,Digital Output,Left airpuff,OFF,,126156,4859284,14:17:05.180
+00:00:05.3,Wait,0.20 sec,Delay,,126161,4859476,14:17:05.380
+00:00:05.3,Digital Output,Right airpuff,ON,,126161,4859476,14:17:05.381
+00:00:05.4,Wait,0.10 sec,Delay,,126164,4859591,14:17:05.482
+00:00:05.4,Digital Output,Right airpuff,OFF,,126164,4859591,14:17:05.483
+00:00:05.6,Wait,0.20 sec,Delay,,126169,4859782,14:17:05.683
+00:00:05.6,Digital Output,Left airpuff,ON,,126169,4859782,14:17:05.684
+00:00:05.7,Wait,0.10 sec,Delay,,126172,4859898,14:17:05.784
+00:00:05.7,Digital Output,Left airpuff,OFF,,126172,4859898,14:17:05.785
+00:00:05.9,Wait,0.20 sec,Delay,,126177,4860090,14:17:05.985
+00:00:05.9,Digital Output,Right airpuff,ON,,126177,4860090,14:17:05.986
+00:00:06.0,Wait,0.10 sec,Delay,,126179,4860166,14:17:06.086
+00:00:06.0,Digital Output,Right airpuff,OFF,,126180,4860205,14:17:06.087
+00:00:06.2,Wait,0.20 sec,Delay,,126185,4860397,14:17:06.287
+00:00:06.2,Digital Output,Left airpuff,ON,,126185,4860397,14:17:06.288
+00:00:06.3,Wait,0.10 sec,Delay,,126187,4860473,14:17:06.388
+00:00:06.3,Digital Output,Left airpuff,OFF,,126187,4860473,14:17:06.389
+00:00:06.5,Wait,0.20 sec,Delay,,126193,4860704,14:17:06.589
+00:00:06.5,Digital Output,Right airpuff,ON,,126193,4860704,14:17:06.590
+00:00:06.6,Wait,0.10 sec,Delay,,126195,4860780,14:17:06.690
+00:00:06.6,Digital Output,Right airpuff,OFF,,126195,4860780,14:17:06.691
+00:00:06.8,Wait,0.20 sec,Delay,,126200,4860972,14:17:06.891
+00:00:06.8,Digital Output,Left airpuff,ON,,126201,4861011,14:17:06.892
+00:00:06.9,Wait,0.10 sec,Delay,,126203,4861087,14:17:06.992
+00:00:06.9,Digital Output,Left airpuff,OFF,,126203,4861087,14:17:06.993
+00:00:07.1,Wait,0.20 sec,Delay,,126208,4861279,14:17:07.193
+00:00:07.1,Digital Output,Right airpuff,ON,,126208,4861279,14:17:07.194
+00:00:07.2,Wait,0.10 sec,Delay,,126211,4861394,14:17:07.294
+00:00:07.2,Digital Output,Right airpuff,OFF,,126211,4861394,14:17:07.295
+00:00:07.4,Wait,0.20 sec,Delay,,126216,4861586,14:17:07.495
+00:00:07.4,Digital Output,Left odour shutoff,OFF,,126216,4861586,14:17:07.496
+00:00:07.4,Digital Output,Right odour shutoff,OFF,,126216,4861586,14:17:07.497
+00:00:07.4,Experiment State,Set state,biased test MCH(R)+OCT(L),biased test MCH(R)+OCT(L),126216,4861586,14:17:07.497
+00:00:07.4,Subroutine,biased test MCH(R)+OCT(L),Iterations = 1,,126216,4861586,14:17:07.498
+00:00:07.4,Digital Output,Right MCH,ON,,126216,4861586,14:17:07.499
+00:00:07.4,Digital Output,Left OCT,ON,,126216,4861586,14:17:07.500
+00:02:07.4,Wait,120.00 sec,Delay,,129343,4981598,14:19:07.480
+00:02:07.4,Digital Output,Right MCH,OFF,,129343,4981598,14:19:07.481
+00:02:07.4,Digital Output,Left OCT,OFF,,129343,4981598,14:19:07.482
+00:02:07.4,Experiment State,Set state,Acclimatise: Air,,129343,4981598,14:19:07.482
+00:02:07.4,Subroutine,comp air,Iterations = 1,Compensatory air for 60s,129343,4981598,14:19:07.482
+00:02:07.4,Digital Output,Left comp air,ON,,129343,4981598,14:19:07.484
+00:02:07.4,Digital Output,Right comp air,ON,,129343,4981598,14:19:07.485
+00:03:07.4,Wait,60.00 sec,Delay,,130906,5041584,14:20:07.485
+00:03:07.4,Digital Output,Left comp air,OFF,,130906,5041584,14:20:07.486
+00:03:07.4,Digital Output,Right comp air,OFF,,130906,5041584,14:20:07.488
+00:03:07.4,Experiment State,Set state,Shock Training: OCT(R) + OCT(L),,130906,5041584,14:20:07.488
+00:03:07.4,Subroutine,OCT training,Iterations = 1,OCT R+L (60 sec) shock,130906,5041584,14:20:07.488
+00:03:07.4,Digital Output,Right OCT,ON,,130906,5041584,14:20:07.489
+00:03:07.4,Digital Output,Left OCT,ON,,130906,5041584,14:20:07.491
+00:03:10.4,Wait,3.00 sec,Delay,,130984,5044577,14:20:10.491
+00:03:10.4,Feedback Stimulation,Shock,-2.000 < cX < 2.000,,130984,5044577,14:20:10.491
+00:04:07.4,Wait,57.00 sec,Delay,,132470,5101608,14:21:07.492
+00:04:07.4,Feedback Stimulation,Shock,Disabled,,132470,5101608,14:21:07.492
+00:04:07.4,Digital Output,Left OCT,OFF,,132470,5101608,14:21:07.493
+00:04:07.4,Digital Output,Right OCT,OFF,,132470,5101608,14:21:07.495
+00:04:07.5,Experiment State,Set state,Recess: Air,,132472,5101685,14:21:07.595
+00:04:07.5,Subroutine,comp air,Iterations = 1,Compensatory air for 60 sec,132472,5101685,14:21:07.595
+00:04:07.5,Digital Output,Left comp air,ON,,132472,5101685,14:21:07.596
+00:04:07.5,Digital Output,Right comp air,ON,,132472,5101685,14:21:07.598
+00:05:07.5,Wait,60.00 sec,Delay,,134035,5161672,14:22:07.578
+00:05:07.5,Digital Output,Left comp air,OFF,,134035,5161672,14:22:07.579
+00:05:07.5,Digital Output,Right comp air,OFF,,134035,5161672,14:22:07.581
+00:05:07.5,Experiment State,Set state,No Shock: MCH(R) + MCH(L),,134035,5161672,14:22:07.581
+00:05:07.5,Subroutine,MCH 60s,Iterations = 1,MCH both sides for 60 sec,134035,5161672,14:22:07.581
+00:05:07.5,Digital Output,Right MCH,ON,,134035,5161672,14:22:07.583
+00:05:07.5,Digital Output,Left MCH,ON,,134035,5161672,14:22:07.584
+00:06:07.5,Wait,60.00 sec,Delay,,135599,5221696,14:23:07.586
+00:06:07.5,Digital Output,Left MCH,OFF,,135599,5221696,14:23:07.588
+00:06:07.5,Digital Output,Right MCH,OFF,,135599,5221696,14:23:07.589
+00:06:07.6,Experiment State,Set state,Recess: Air,,135601,5221773,14:23:07.690
+00:06:07.6,Subroutine,comp air,Iterations = 1,120 sec comp air,135601,5221773,14:23:07.690
+00:06:07.6,Digital Output,Left comp air,ON,,135601,5221773,14:23:07.691
+00:06:07.6,Digital Output,Right comp air,ON,,135601,5221773,14:23:07.693
+00:08:07.6,Wait,120.00 sec,Delay,,138728,5341785,14:25:07.693
+00:08:07.6,Digital Output,Left comp air,OFF,,138728,5341785,14:25:07.695
+00:08:07.6,Digital Output,Right comp air,OFF,,138728,5341785,14:25:07.696
+00:08:07.6,Experiment State,Set state,Static Test: MCH(R) + OCT(L),,138728,5341785,14:25:07.696
+00:08:07.6,Digital Output,Right MCH,ON,Start Static test,138728,5341785,14:25:07.698
+00:08:07.6,Digital Output,Left OCT,ON,,138728,5341785,14:25:07.699
+00:10:07.6,Wait,120.00 sec,Delay,Static test duration,141855,5461796,14:27:07.681
+00:10:07.6,Subroutine,Airpuff agitation,Iterations = 1,,141855,5461796,14:27:07.681
+00:10:07.6,Digital Output,Left odour shutoff,ON,,141855,5461796,14:27:07.682
+00:10:07.6,Digital Output,Right odour shutoff,ON,,141855,5461796,14:27:07.684
+00:10:12.6,Wait,5.00 sec,Delay,,141985,5466785,14:27:12.685
+00:10:12.6,Subroutine,Left RIght Puff,Iterations = 4,,141985,5466785,14:27:12.685
+00:10:12.6,Digital Output,Left airpuff,ON,,141985,5466785,14:27:12.686
+00:10:12.7,Wait,0.10 sec,Delay,,141988,5466900,14:27:12.787
+00:10:12.7,Digital Output,Left airpuff,OFF,,141988,5466900,14:27:12.788
+00:10:12.9,Wait,0.20 sec,Delay,,141993,5467092,14:27:12.989
+00:10:12.9,Digital Output,Right airpuff,ON,,141993,5467092,14:27:12.990
+00:10:13.0,Wait,0.10 sec,Delay,,141996,5467207,14:27:13.091
+00:10:13.0,Digital Output,Right airpuff,OFF,,141996,5467207,14:27:13.092
+00:10:13.2,Wait,0.20 sec,Delay,,142001,5467399,14:27:13.293
+00:10:13.2,Digital Output,Left airpuff,ON,,142001,5467399,14:27:13.294
+00:10:13.3,Wait,0.10 sec,Delay,,142003,5467476,14:27:13.395
+00:10:13.3,Digital Output,Left airpuff,OFF,,142003,5467476,14:27:13.396
+00:10:13.5,Wait,0.20 sec,Delay,,142008,5467668,14:27:13.577
+00:10:13.5,Digital Output,Right airpuff,ON,,142008,5467668,14:27:13.578
+00:10:13.6,Wait,0.10 sec,Delay,,142011,5467783,14:27:13.678
+00:10:13.6,Digital Output,Right airpuff,OFF,,142011,5467783,14:27:13.679
+00:10:13.8,Wait,0.20 sec,Delay,,142016,5467975,14:27:13.879
+00:10:13.8,Digital Output,Left airpuff,ON,,142016,5467975,14:27:13.880
+00:10:13.9,Wait,0.10 sec,Delay,,142019,5468090,14:27:13.980
+00:10:13.9,Digital Output,Left airpuff,OFF,,142019,5468090,14:27:13.981
+00:10:14.1,Wait,0.20 sec,Delay,,142024,5468282,14:27:14.182
+00:10:14.1,Digital Output,Right airpuff,ON,,142024,5468282,14:27:14.183
+00:10:14.2,Wait,0.10 sec,Delay,,142027,5468397,14:27:14.283
+00:10:14.2,Digital Output,Right airpuff,OFF,,142027,5468397,14:27:14.284
+00:10:14.4,Wait,0.20 sec,Delay,,142032,5468589,14:27:14.484
+00:10:14.4,Digital Output,Left airpuff,ON,,142032,5468589,14:27:14.485
+00:10:14.5,Wait,0.10 sec,Delay,,142035,5468704,14:27:14.586
+00:10:14.5,Digital Output,Left airpuff,OFF,,142035,5468704,14:27:14.587
+00:10:14.7,Wait,0.20 sec,Delay,,142040,5468896,14:27:14.788
+00:10:14.7,Digital Output,Right airpuff,ON,,142040,5468896,14:27:14.789
+00:10:14.8,Wait,0.10 sec,Delay,,142042,5468973,14:27:14.889
+00:10:14.8,Digital Output,Right airpuff,OFF,,142042,5468973,14:27:14.890
+00:10:15.0,Wait,0.20 sec,Delay,,142048,5469203,14:27:15.091
+00:10:15.0,Digital Output,Left odour shutoff,OFF,,142048,5469203,14:27:15.092
+00:10:15.0,Digital Output,Right odour shutoff,OFF,,142048,5469203,14:27:15.093
+00:10:15.0,Experiment State,Set state,Arousal Test: MCH(R) + OCT(L),,142048,5469203,14:27:15.093
+00:12:15.0,Wait,120.00 sec,Delay,Arousal test duration,145174,5589176,14:29:15.096
+00:12:15.0,Digital Output,Right MCH,OFF,,145175,5589214,14:29:15.097
+00:12:15.0,Digital Output,Left OCT,OFF,End Arousal test,145175,5589214,14:29:15.099
+00:12:15.0,Plugin,Opto LED,All Off,,145175,5589214,14:29:15.099
+00:12:15.0,Experiment State,Set state,Complete,,145175,5589214,14:29:15.099
+00:12:17.0,Plugin,Mutli-Fly Tracker,LOG Off,End test count,145226,5591172,14:29:17.080
+00:12:17.0,Plugin,Mutli-Fly Tracker,LOG Close,,145226,5591172,14:29:17.080
+14:29:17.0,End of Sequence,,,,,,
