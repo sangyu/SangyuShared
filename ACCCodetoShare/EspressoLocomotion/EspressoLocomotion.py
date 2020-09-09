@@ -85,10 +85,13 @@ class EspressoLocomotion(object):
         
     def plotContrasts(self, y, colorBy, compareBy, groupBy = 'Temperature'):
         resultsDf = self.resultsDf
-        resultsDf['newPlotColumn'] = resultsDf[groupBy] + ' ' + resultsDf[compareBy] 
+        resultsDf['newPlotColumn'] = resultsDf[groupBy] + '@' + resultsDf[compareBy] 
+        uniqueGroupBy = np.unique(resultsDf[groupBy])
+        uniqueCompareBy = np.unique(resultsDf[compareBy])
+        listIdx = [tuple(gp + '@' + uniqueCompareBy[::-1]) for gp in uniqueGroupBy]
 
-        listIdx = (tuple(np.unique(resultsDf[groupBy])[0]+' '+np.unique(resultsDf[compareBy])[::-1]), tuple(np.unique(resultsDf[groupBy])[1]+' '+np.unique(resultsDf[compareBy])[::-1]))
-        flatListIdx = [item for t in listIdx for item in t] 
+        # listIdx = (tuple(np.unique(resultsDf[groupBy])[0]+' '+np.unique(resultsDf[compareBy])[::-1]), tuple(np.unique(resultsDf[groupBy])[1]+' '+np.unique(resultsDf[compareBy])[::-1]))
+        # flatListIdx = [item for t in listIdx for item in t] 
         customPalette = locoPlotters.espressoCreatePalette(resultsDf[colorBy])
         setFont('Source Sans Bold', 10)
         dabestContrastData = dabest.load(resultsDf,
@@ -99,7 +102,11 @@ class EspressoLocomotion(object):
                               )
         
         fig = dabestContrastData.mean_diff.plot( color_col=colorBy, custom_palette = customPalette)
+        flatListIdx = [item.split('@')[1] for t in listIdx for item in t] 
         fig.axes[0].set_xticklabels(flatListIdx, rotation = 45, ha="right")
+        
+        # diffListIdx = flatListIdx[]
+        fig.axes[1].set_xticklabels(flatListIdx, rotation = 45, ha="right")
 
     # def saveEspressoLocomotionObj(self):
     #     with open(self.outputFolder + 'locoObj_'+ str(self.startMin) + 'to' + str(self.endMin) + '.pickle', 'wb') as f:

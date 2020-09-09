@@ -12,6 +12,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import locoUtilities
+import datetime
+import re
 
 def readMetaAndCount(dataFolder, startMin, endMin):
     conversion = 0.215
@@ -31,14 +33,21 @@ def readMetaAndCount(dataFolder, startMin, endMin):
     for dataSetNumber in range(0, len(countLogList)):
         print(countLogList[dataSetNumber])
         print(metaDataList[dataSetNumber])
+        companionMetaData = [m for m in metaDataList if (datetime.datetime.strptime(m[9:28], '%Y-%m-%d_%H-%M-%S') - datetime.datetime.strptime(countLogList[dataSetNumber][9:28], '%Y-%m-%d_%H-%M-%S')).seconds < 5][0]
+        metaDataDf=pd.read_csv( dataFolder + companionMetaData)
+        metaDataDf.columns = metaDataDf.columns.str.replace(' ', '')
+        metaDataDf['Date'] = countLogList[dataSetNumber][9:28]
         countLogDfUnselected=pd.read_csv( dataFolder + countLogList[dataSetNumber] )
+        expectedIDs = {int(re.search(r'Ch(.*)_Obj1_X', s).group(1)) for s in countLogDfUnselected.filter(regex = '_X').columns}
+        existingIDs = set(metaDataDf.ID)
+        diffID = expectedIDs - existingIDs 
+        print('MetaData is missing IDs ' + str(np.sort(list(diffID))))
+        for id in diffID:
+            todrop = countLogDfUnselected.filter(regex = 'Ch'+str(id)).columns
+            countLogDfUnselected = countLogDfUnselected.drop(todrop.tolist(), axis = 1)
 #        countLogColumns = countLogDfUnselected.columns.str
         countLogDfTrimmed = calculateSpeedinCountLog(countLogDfUnselected)
         countLogDfTimeBanded=countLogDfTrimmed.loc[(countLogDfTrimmed.Seconds > startMin *60) & (countLogDfTrimmed.Seconds < endMin * 60)]
-        metaDataName = [s for s in metaDataList if countLogList[dataSetNumber][9:25] in s][0]
-        metaDataDf=pd.read_csv( dataFolder + metaDataName)
-        metaDataDf.columns = metaDataDf.columns.str.replace(' ', '')
-        metaDataDf['Date'] = countLogList[dataSetNumber][9:28]
         countLogDfNew, countLogDfOld = locoUtilities.resampleCountLog(countLogDfTimeBanded, countLogList[dataSetNumber], 50)
         countLogDfNew.columns = countLogList[dataSetNumber][9:28] + '_' + countLogDfNew.columns
         if dataSetNumber == 0:
@@ -50,6 +59,7 @@ def readMetaAndCount(dataFolder, startMin, endMin):
     bigMetaDataDf = bigMetaDataDf.reset_index(drop = True)
     bigMetaDataDf['Genotype'] = bigMetaDataDf['Genotype'].str.lower()
     bigMetaDataDf = assignStatus(bigMetaDataDf)
+    print(bigMetaDataDf)
     return bigMetaDataDf, bigCountLogDf
 
 def calculateSpeedinCountLog(countLogDf, speedThreshold = 20):

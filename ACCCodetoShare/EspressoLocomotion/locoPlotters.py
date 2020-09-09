@@ -169,19 +169,22 @@ def putThingsInToChamberSubplot(countLogDf, metaDataDf, plotFunc = espressoPlotT
     noOfRows=int(np.ceil(len(metaDataDf)/15))
     chamberSmalls, axarr = plt.subplots(noOfRows, 15, figsize = [20, noOfRows*2.5])
     metaDataDf = metaDataDf.reset_index()
-    for j in metaDataDf.index+1:
-        col = np.mod(j-1, 15)
-        row = int((j - col - 1)/15)
-        plt.sca(axarr[row, col])
+    for j in metaDataDf.index:
+        id = metaDataDf.loc[j, 'ID']
+        col = np.mod(id-1, 15)
+        row = int((id - col)/15)
+        chamberSmalls.sca(axarr[row, col])
         colorPalette = espressoCreatePalette(metaDataDf['Genotype'])
-        flyGenotype = metaDataDf['Genotype'][j-1]
+        flyGenotype = metaDataDf['Genotype'][j]
         X = countLogDf.filter(regex = '_X')
         Y = countLogDf.filter(regex = '_Y')
 #        plotFunc(X.iloc[:, j-1], Y.iloc[:, j-1], flyGenotype, colorPalette)
-        plotFunc(X.iloc[:, j-1], Y.iloc[:, j-1], flyGenotype, colorPalette)
-        espressoChamberStyling(axarr[row, col])
+        plotFunc(X.iloc[:, j], Y.iloc[:, j], flyGenotype, colorPalette)
 #        axarr[row, col].set_title(flyGenotype)
     chamberSmalls.suptitle(metaDataDf.loc[0, 'Date'] + ' ' + str(metaDataDf.loc[0, 'Temperature']) )
+    for row in range(0, axarr.shape[0]):
+        for col in range(0, axarr.shape[1]):
+            espressoChamberStyling(axarr[row, col])
     return chamberSmalls, axarr 
 #
 
