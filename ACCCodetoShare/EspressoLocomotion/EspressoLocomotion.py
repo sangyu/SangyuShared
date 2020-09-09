@@ -18,7 +18,7 @@ from setFont import setFont
 
 class EspressoLocomotion(object):
     def __init__(self, dataFolder, startMin, endMin):
-        self.version = '0.0.1'
+        self.version = '0.0.2'
         bigMetaDataDf, bigCountLogDf = locoDataMunger.readMetaAndCount(dataFolder, startMin, endMin)
         self.metaDataDf = bigMetaDataDf
         self.countLogDf = bigCountLogDf
