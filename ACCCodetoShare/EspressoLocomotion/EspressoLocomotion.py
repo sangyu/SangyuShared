@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Mar 18 17:59:42 2020
-@author: Sanguyu Xu 
+@author: Sanguyu Xu
 xusangyu@gmail.com
 """
 import os
@@ -17,9 +17,9 @@ import dabest
 from setFont import setFont
 
 class EspressoLocomotion(object):
-    def __init__(self, dataFolder, startMin, endMin):
-        self.version = '0.0.2'
-        bigMetaDataDf, bigCountLogDf = locoDataMunger.readMetaAndCount(dataFolder, startMin, endMin)
+    def __init__(self, dataFolder, startMin, endMin, initialResamplePeriod = 50, longForm = False):
+        self.version = '0.0.3'
+        bigMetaDataDf, bigCountLogDf = locoDataMunger.readMetaAndCount(dataFolder, startMin, endMin, initialResamplePeriod, longForm)
         self.metaDataDf = bigMetaDataDf
         self.countLogDf = bigCountLogDf
         outputDir = locoUtilities.makeOutputFolders(dataFolder)
@@ -40,28 +40,28 @@ class EspressoLocomotion(object):
             OutputDir = self.outputFolder + 'chamberPlots/'
             locoUtilities.espressoSaveFig(chamberSmallsTrack, 'chamberSmallsTrack', dates[i], OutputDir, pngDPI = 200)
             locoUtilities.espressoSaveFig(chamberSmallsHeat, 'chamberSmallsHeat', dates[i], OutputDir, pngDPI = 200)
- 
+
     def plotMeanHeatMaps(self, binSize = 0.8, row = None, col = None, verbose = False):
         heatMapOutputDir = self.outputFolder
         if verbose:
             meanHeatmapFig,axes,  Hall, resultsDf, smallHeatmapFigs = locoPlotters.espressoPlotMeanHeatmaps(self, binSize, verbose)
             locoUtilities.espressoSaveFig(smallHeatmapFigs, 'smallHeatmapFigs', self.metaDataDf.Date[0], heatMapOutputDir, pngDPI = 200)
         else:
-            meanHeatmapFig, axes, Hall, resultsDf = locoPlotters.espressoPlotMeanHeatmaps(self, binSize, row, col, verbose)    
+            meanHeatmapFig, axes, Hall, resultsDf = locoPlotters.espressoPlotMeanHeatmaps(self, binSize, row, col, verbose)
         self.resultsDf = resultsDf
         self.heatmapMatrix = Hall
         self.heatmapAxes = axes
         self.meanHeatmapFig = meanHeatmapFig
-    
+
     def plotBoundedSpeedLines(self, colorBy, row = None, col = None, rp = '200s', YLim = None):
         setFont('Source Sans Pro', 14)
         T = self.countLogDf.iloc[:, 0]/3600
         VV =self.countLogDf.filter(regex = '_V')
         self.resultsDf['averageSpeed'] = np.nanmean(VV, axis = 0)
-        listOfPlots, gp, custom_palette = locoPlotters.subplotRowColColor(self, colorBy, row, col)
+        listOfPlots, gp, custom_palette = locoPlotters.subplotRowColColor(self.metaDataDf, colorBy, row, col)
         nr, nc = listOfPlots[-1][0][0:2]
         figure, axes = plt.subplots(nrows=nr + 1, ncols=nc + 1, squeeze = False, figsize=(5 * (nc + 1), 5 * (nr + 1)))
-        
+
         maxYlim = [0]*len(listOfPlots)
         for i in range(0, len(listOfPlots)):
             print(listOfPlots[i])
@@ -82,16 +82,15 @@ class EspressoLocomotion(object):
                 axes[ro, co].set_ylim([0, np.max(maxYlim)])
         plt.show()
         locoUtilities.espressoSaveFig(figure, 'splitTS', self.metaDataDf.Date[0], self.outputFolder)
-        
+
+        return figure,  axes
+
     def plotContrasts(self, y, colorBy, compareBy, groupBy = 'Temperature'):
         resultsDf = self.resultsDf
-        resultsDf['newPlotColumn'] = resultsDf[groupBy] + '@' + resultsDf[compareBy] 
-        uniqueGroupBy = np.unique(resultsDf[groupBy])
-        uniqueCompareBy = np.unique(resultsDf[compareBy])
-        listIdx = [tuple(gp + '@' + uniqueCompareBy[::-1]) for gp in uniqueGroupBy]
+        resultsDf['newPlotColumn'] = resultsDf[groupBy] + ' ' + resultsDf[compareBy]
 
         # listIdx = (tuple(np.unique(resultsDf[groupBy])[0]+' '+np.unique(resultsDf[compareBy])[::-1]), tuple(np.unique(resultsDf[groupBy])[1]+' '+np.unique(resultsDf[compareBy])[::-1]))
-        # flatListIdx = [item for t in listIdx for item in t] 
+        # flatListIdx = [item for t in listIdx for item in t]
         customPalette = locoPlotters.espressoCreatePalette(resultsDf[colorBy])
         setFont('Source Sans Bold', 10)
         dabestContrastData = dabest.load(resultsDf,
@@ -100,11 +99,11 @@ class EspressoLocomotion(object):
                                idx=listIdx,
                                paired=False
                               )
-        
+
         fig = dabestContrastData.mean_diff.plot( color_col=colorBy, custom_palette = customPalette)
-        flatListIdx = [item.split('@')[1] for t in listIdx for item in t] 
+        flatListIdx = [item.split('@')[1] for t in listIdx for item in t]
         fig.axes[0].set_xticklabels(flatListIdx, rotation = 45, ha="right")
-        
+
         # diffListIdx = flatListIdx[]
         fig.axes[1].set_xticklabels(flatListIdx, rotation = 45, ha="right")
 
@@ -112,7 +111,7 @@ class EspressoLocomotion(object):
     #     with open(self.outputFolder + 'locoObj_'+ str(self.startMin) + 'to' + str(self.endMin) + '.pickle', 'wb') as f:
     #     # Pickle the 'data' dictionary using the highest protocol available.
     #         pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
-        
+
     # def loadEspressoLocomotionObj(pickleFileName):
     #     with open(pickleFileName, 'rb') as f:
     #         data = pickle.load(f)

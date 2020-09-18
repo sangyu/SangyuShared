@@ -15,7 +15,7 @@ import locoUtilities
 import datetime
 import re
 
-def readMetaAndCount(dataFolder, startMin, endMin):
+def readMetaAndCount(dataFolder, startMin, endMin, initialResamplePeriod, longForm = False):
     conversion = 0.215
     filelist=os.listdir(dataFolder)
     countLogList = [s for s in filelist if "CountLog" in s]
@@ -33,21 +33,75 @@ def readMetaAndCount(dataFolder, startMin, endMin):
     for dataSetNumber in range(0, len(countLogList)):
         print(countLogList[dataSetNumber])
         print(metaDataList[dataSetNumber])
-        companionMetaData = [m for m in metaDataList if (datetime.datetime.strptime(m[9:28], '%Y-%m-%d_%H-%M-%S') - datetime.datetime.strptime(countLogList[dataSetNumber][9:28], '%Y-%m-%d_%H-%M-%S')).seconds < 5][0]
+        companionMetaData = [m for m in metaDataList if np.abs((datetime.datetime.strptime(m[9:28], '%Y-%m-%d_%H-%M-%S') - datetime.datetime.strptime(countLogList[dataSetNumber][9:28], '%Y-%m-%d_%H-%M-%S')).seconds) < 5][0]
         metaDataDf=pd.read_csv( dataFolder + companionMetaData)
-        metaDataDf.columns = metaDataDf.columns.str.replace(' ', '')
-        metaDataDf['Date'] = countLogList[dataSetNumber][9:28]
-        countLogDfUnselected=pd.read_csv( dataFolder + countLogList[dataSetNumber] )
+        reader=pd.read_csv( dataFolder + countLogList[dataSetNumber], chunksize =  (endMin+1) * 60 * 30)
+        countLogDfUnselected=reader.get_chunk()
         expectedIDs = {int(re.search(r'Ch(.*)_Obj1_X', s).group(1)) for s in countLogDfUnselected.filter(regex = '_X').columns}
         existingIDs = set(metaDataDf.ID)
-        diffID = expectedIDs - existingIDs 
-        print('MetaData is missing IDs ' + str(np.sort(list(diffID))))
+        diffID = expectedIDs - existingIDs
+        if len(diffID)>0:
+            print('MetaData is missing IDs ' + str(np.sort(list(diffID))))
         for id in diffID:
             todrop = countLogDfUnselected.filter(regex = 'Ch'+str(id)).columns
             countLogDfUnselected = countLogDfUnselected.drop(todrop.tolist(), axis = 1)
+
 #        countLogColumns = countLogDfUnselected.columns.str
         countLogDfTrimmed = calculateSpeedinCountLog(countLogDfUnselected)
         countLogDfTimeBanded=countLogDfTrimmed.loc[(countLogDfTrimmed.Seconds > startMin *60) & (countLogDfTrimmed.Seconds < endMin * 60)]
+        metaDataDf.columns = metaDataDf.columns.str.replace(' ', '')
+        metaDataDf['Date'] = countLogList[dataSetNumber][9:28]
+        countLogDfNew, countLogDfOld = locoUtilities.resampleCountLog(countLogDfTimeBanded, countLogList[dataSetNumber], initialResamplePeriod, longForm)
+        if longForm is False:
+            countLogDfNew.columns = countLogList[dataSetNumber][9:28] + '_' + countLogDfNew.columns
+        if dataSetNumber == 0:
+            bigCountLogDf = countLogDfNew
+            bigMetaDataDf = metaDataDf
+        else:
+            if longForm :
+                bigCountLogDf = pd.concat([bigCountLogDf, countLogDfNew], axis = 0)
+            else:
+                bigCountLogDf = pd.concat([bigCountLogDf, countLogDfNew], axis = 1)
+                bigMetaDataDf = pd.concat([bigMetaDataDf, metaDataDf], axis = 0)
+
+    bigMetaDataDf = bigMetaDataDf.reset_index(drop = True)
+    bigMetaDataDf['Genotype'] = bigMetaDataDf['Genotype'].str.lower()
+    bigMetaDataDf = assignStatus(bigMetaDataDf)
+    return bigMetaDataDf, bigCountLogDf
+
+
+def readMetaAndCountfromOSAR(dataFolder, startMin, endMin):
+    conversion = 0.215
+    filelist=os.listdir(dataFolder)
+    countLogList = [s for s in filelist if "CountLog" in s]
+    metaDataList = [s for s in filelist if "MetaData" in s]
+    if len(metaDataList)!=len(countLogList):
+        print('Different numbers of metadata files and countLog files')
+    countLogList=np.sort(countLogList)
+    metaDataList=np.sort(metaDataList)
+    print('countLog files found: \n')
+    print(countLogList)
+    print('\nmetadata files found: \n')
+    print(metaDataList)
+    bigCountLogDf = pd.DataFrame()
+    bigMetaDataDf = pd.DataFrame()
+    for dataSetNumber in range(0, len(countLogList)):
+        print(countLogList[dataSetNumber])
+        print(metaDataList[dataSetNumber])
+        countLogDfUnselected=pd.read_csv( dataFolder + countLogList[dataSetNumber] )
+#        countLogColumns = countLogDfUnselected.columns.str
+        PI = countLogDfUnselected.filter(regex = 'LightPI')
+        EX = countLogDfUnselected.filter(regex = 'ExperimentalState')
+        XX = countLogDfUnselected.filter(regex = '_cX')
+        YY = countLogDfUnselected.filter(regex = '_cY')
+        ZZ = countLogDfUnselected.filter(regex = 'Zone')
+        IL = countLogDfUnselected.filter(regex = '_InLight')
+        countLogDfTrimmed = pd.concat([countLogDfUnselected.iloc[:, [0, 1, 2]], PI, EX, XX, YY, ZZ, IL], axis = 1)
+        countLogDfTimeBanded=countLogDfTrimmed.loc[(countLogDfTrimmed.Seconds > startMin *60) & (countLogDfTrimmed.Seconds < endMin * 60)]
+        metaDataName = [s for s in metaDataList if countLogList[dataSetNumber][9:25] in s][0]
+        metaDataDf=pd.read_csv( dataFolder + metaDataName)
+        metaDataDf.columns = metaDataDf.columns.str.replace(' ', '')
+        metaDataDf['Date'] = countLogList[dataSetNumber][9:28]
         countLogDfNew, countLogDfOld = locoUtilities.resampleCountLog(countLogDfTimeBanded, countLogList[dataSetNumber], 50)
         countLogDfNew.columns = countLogList[dataSetNumber][9:28] + '_' + countLogDfNew.columns
         if dataSetNumber == 0:
@@ -59,8 +113,28 @@ def readMetaAndCount(dataFolder, startMin, endMin):
     bigMetaDataDf = bigMetaDataDf.reset_index(drop = True)
     bigMetaDataDf['Genotype'] = bigMetaDataDf['Genotype'].str.lower()
     bigMetaDataDf = assignStatus(bigMetaDataDf)
-    print(bigMetaDataDf)
     return bigMetaDataDf, bigCountLogDf
+
+# def calculateSpeedinOSARCountLog(countLogDf, speedThreshold = 20):
+#     conversion = 0.215
+#     cx = countLogDf.filter(regex = '_cX')*conversion
+#     cy = 18 - countLogDf.filter(regex = '_cY')*conversion
+#     cv = countLogDf.filter(regex = '_Vpix/s')*conversion
+#     XX = cx.rename(columns = lambda x : str(x)[:-2])
+#     YY = cy.rename(columns = lambda x : str(x)[:-2])
+#     VV = cv.rename(columns = lambda x : str(x)[:-7])
+#     for column in VV.columns:
+#         indToDelete = VV[column]>speedThreshold
+#         VV.loc[indToDelete, column] = np.nan
+#         XX.loc[indToDelete, column] = np.nan
+#         YY.loc[indToDelete, column] = np.nan
+#     XX = XX.rename(columns = lambda x : str(x)+'_X')
+#     YY = YY.rename(columns = lambda x : str(x)+'_Y')
+#     VV = VV.rename(columns = lambda x : str(x)+'_V')
+#     newCountLog = pd.concat([countLogDf.iloc[:, [0, 1, 2]], XX, YY, VV], axis = 1)
+#     return newCountLog
+
+
 
 def calculateSpeedinCountLog(countLogDf, speedThreshold = 20):
     conversion = 0.215
@@ -92,7 +166,7 @@ def intrapolateUnderThreshold(s, th):
 
 def assignStatus(metaDataDf):
     if 'Status' not in metaDataDf.columns:
-        metaDataDf.insert(1, 'Status', metaDataDf.Genotype, True) 
+        metaDataDf.insert(1, 'Status', metaDataDf.Genotype, True)
         metaDataDfCopy = metaDataDf.copy()
         TestInd=[i for i, s in enumerate(metaDataDf.Genotype) if 'w1118' not in s ]
         metaDataDfCopy['Status'] = 'Sibling'

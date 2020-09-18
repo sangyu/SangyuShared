@@ -3,7 +3,7 @@
 """
 Created on Mon Jul 27 14:30:12 2020
 
-@author: Sanguyu Xu 
+@author: Sanguyu Xu
 xusangyu@gmail.com
 """
 
@@ -17,15 +17,15 @@ from setFont import setFont
 def espressoChamberStyling(ax, axisSwitch = 'off'):
     ax.set_aspect('equal')
     ax.spines['bottom'].set_color('gray')
-    ax.spines['top'].set_color('gray') 
+    ax.spines['top'].set_color('gray')
     ax.spines['right'].set_color('gray')
     ax.spines['left'].set_color('gray')
     ax.axis(axisSwitch)
     ax.set_xlim(0, 13)
     ax.set_ylim(-2, 18)
-    
 
-def espressoCreatePalette(items, testColor = 'crimson'):  
+
+def espressoCreatePalette(items, testColor = 'crimson'):
     wes_palette, wes_colors = createWesAndersonPalette()
     colorPalette = {}
     keys = np.sort(np.unique(items))[::-1]
@@ -58,14 +58,14 @@ def espressoPlotTracking(X, Y, flyName, colorPalette):
     plt.plot(X, Y, linewidth = 0.5, color = colorPalette[flyName])
     # plt.plot([7, 7], [0, 19], linewidth = 0.5, color = 'r')
     # plt.plot([0, 15], [12, 12], linewidth = 0.5, color = 'r')
-    
-    
+
+
 def espressoPlotHeatmap(X, Y, flyGenotype, colorPalette):
     import matplotlib.colors as mcolors
     plt.hist2d(X[~np.isnan(X)],Y[~np.isnan(Y)], bins=[12, 20],cmap=plt.cm.bone, range=np.array([(0, 13), (-1, 18)]), norm=mcolors.PowerNorm(0.6))
 #    plt.hist2d(X[~np.isnan(X)],Y[~np.isnan(Y)], bins=[50, 80],cmap=plt.cm.jet, range=np.array([(0, 13), (-1, 18)]))
 
-def espressoPlotMeanHeatmaps(espLocoObj, binSize, row = None, col = None, verbose = False):    
+def espressoPlotMeanHeatmaps(espLocoObj, binSize, row = None, col = None, verbose = False):
     from mpl_toolkits.axes_grid1.inset_locator import inset_axes
     setFont('Source Sans Pro', 12)
 
@@ -91,7 +91,7 @@ def espressoPlotMeanHeatmaps(espLocoObj, binSize, row = None, col = None, verbos
         H.append(h)
     Hall = np.dstack(H)
     Hall = Hall/50/60 #originally resampled at 50ms and to convert to minute from second/60
-    listOfPlots, gp, custom_palette = subplotRowColColor(espLocoObj, None, row, col)
+    listOfPlots, gp, custom_palette = subplotRowColColor(espLocoObj.metaDataDf, None, row, col)
     nr, nc = listOfPlots[-1][0][0:2]
     meanHeatmapFig, axes = plt.subplots(nrows=nr + 1, ncols=nc + 1, figsize = (3 * (nc + 1), 4 * (nr + 1)), squeeze = False)
     images = []
@@ -113,12 +113,12 @@ def espressoPlotMeanHeatmaps(espLocoObj, binSize, row = None, col = None, verbos
     right = np.sum(np.sum(Hall[10:15, 21:25, :], axis = 0), axis = 0)
     bottom = np.sum(np.sum(Hall[4:15, 4:7, :], axis = 0), axis = 0)
     resultsDf = espLocoObj.resultsDf
-    
+
     resultsDf['left'] = left
     resultsDf['right'] = right
     resultsDf['bottom'] = bottom
-    resultsDf['LR Preference'] = (resultsDf['left']- resultsDf['right'])/ (resultsDf['right']+resultsDf['left']) 
-    resultsDf['TB Preference'] = (resultsDf['right'] + resultsDf['left'] - resultsDf['bottom'])/ (resultsDf['bottom']+resultsDf['right']+resultsDf['left']) 
+    resultsDf['LR Preference'] = (resultsDf['left']- resultsDf['right'])/ (resultsDf['right']+resultsDf['left'])
+    resultsDf['TB Preference'] = (resultsDf['right'] + resultsDf['left'] - resultsDf['bottom'])/ (resultsDf['bottom']+resultsDf['right']+resultsDf['left'])
     vmin = min(image.get_array().min() for image in images)
     vmax = max(image.get_array().max() for image in images)
     norm = colors.Normalize(vmin=vmin, vmax=vmax)
@@ -132,7 +132,7 @@ def espressoPlotMeanHeatmaps(espLocoObj, binSize, row = None, col = None, verbos
                    bbox_transform=axes[-1, -1].transAxes,
                    borderpad=0,
                    )
-    meanHeatmapFig.colorbar(images[-1], cax=axins, ticks=[0, 1, 2])
+    meanHeatmapFig.colorbar(images[-1], cax=axins, ticks=[0, 5, 10, 15, 20])
     def update(changed_image):
         for im in images:
             if (changed_image.get_cmap() != im.get_cmap()
@@ -140,7 +140,7 @@ def espressoPlotMeanHeatmaps(espLocoObj, binSize, row = None, col = None, verbos
                 im.set_cmap(changed_image.get_cmap())
                 im.set_clim(changed_image.get_clim())
     for im in images:
-        im.callbacksSM.connect('changed', update)    
+        im.callbacksSM.connect('changed', update)
     plt.show()
     meanHeatmapFileName = 'meanHeatmapFig'+ '_' + str(col) + '_' + str(row) + str(espLocoObj.startMin) + '-' + str(espLocoObj.endMin) + 'min'
     locoUtilities.espressoSaveFig(meanHeatmapFig, meanHeatmapFileName, espLocoObj.metaDataDf.Date[0], espLocoObj.outputFolder)
@@ -155,8 +155,9 @@ def plotBoundedLine(x, Y, ax=None, c = 'k', resamplePeriod = '200s'):
     if ax is None:
         ax = plt.gca()
     setRCParamsAxesTicks(True)
-    Y = Y.resample(resamplePeriod).agg(np.mean)
-    x = x.resample(resamplePeriod).agg(np.mean)
+    if resamplePeriod:
+        Y = Y.resample(resamplePeriod).agg(np.mean)
+        x = x.resample(resamplePeriod).agg(np.mean)
     y = np.nanmean(Y, axis = 1)
     ci = np.nanstd(Y, axis = 1)/(np.sqrt(Y.shape[1]))*1.96
     ax.plot(x, y, color = c) ## example plot here
@@ -175,7 +176,7 @@ def putThingsInToChamberSubplot(countLogDf, metaDataDf, plotFunc = espressoPlotT
         row = int((id - col)/15)
         chamberSmalls.sca(axarr[row, col])
         colorPalette = espressoCreatePalette(metaDataDf['Genotype'])
-        flyGenotype = metaDataDf['Genotype'][j]
+        flyGenotype = metaDataDf['Genotype'][j-1]
         X = countLogDf.filter(regex = '_X')
         Y = countLogDf.filter(regex = '_Y')
 #        plotFunc(X.iloc[:, j-1], Y.iloc[:, j-1], flyGenotype, colorPalette)
@@ -185,12 +186,12 @@ def putThingsInToChamberSubplot(countLogDf, metaDataDf, plotFunc = espressoPlotT
     for row in range(0, axarr.shape[0]):
         for col in range(0, axarr.shape[1]):
             espressoChamberStyling(axarr[row, col])
-    return chamberSmalls, axarr 
+    return chamberSmalls, axarr
 #
 
 
-def subplotRowColColor(espLocoObj, colorBy, row = None, col = None):
-    m = espLocoObj.metaDataDf
+def subplotRowColColor(metaDataDf, colorBy, row = None, col = None):
+    m = metaDataDf
     m = m.applymap(str)
     if row == None:
         m['row'] = ' '
@@ -208,7 +209,7 @@ def subplotRowColColor(espLocoObj, colorBy, row = None, col = None):
             testGenotypeColor = 'crimson'
         elif 'acr' in testGenotypeName:
             testGenotypeColor = 'cyan'
-    else: 
+    else:
         testGenotypeColor = 'lakeblue'
     custom_palette = espressoCreatePalette(m[colorBy], testColor = testGenotypeColor)
     if row == 'Temperature':
@@ -233,12 +234,12 @@ def subplotRowColColor(espLocoObj, colorBy, row = None, col = None):
     w1118InUniqueColors = ['w1118' not in uniqueColors[i] for i in range(len(uniqueColors))]
     newind = np.argsort(w1118InUniqueColors)
     uniqueColors = uniqueColors[newind]
-    
-    
+
+
     listOfPlotsUnfiltered = [((i, j, k), (r, c, cl)) for i, r in enumerate(uniqueRows) for j, c in enumerate(uniqueCols) for k, cl in enumerate(uniqueColors)]
-    listOfPlots = [i for i in listOfPlotsUnfiltered if i[1] in gp.keys()] 
+    listOfPlots = [i for i in listOfPlotsUnfiltered if i[1] in gp.keys()]
     return listOfPlots, gp, custom_palette
-    
+
 
 
 
