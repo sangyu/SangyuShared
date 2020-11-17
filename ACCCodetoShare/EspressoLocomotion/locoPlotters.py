@@ -32,12 +32,20 @@ def espressoCreatePalette(items, testColor = 'crimson'):
     colors = wes_palette
     n=0
     for i in range(len(keys)):
-        if 'gal' in keys[i]:
-            colorPalette[keys[i]] = wes_colors['black']
+        if 'gal4' in keys[i]:
+            if 'w1118' in keys[i]:
+                colorPalette[keys[i]] = wes_colors['black']
             if 'acr' in keys[i]:
                 colorPalette[keys[i]] = wes_colors['cyan']
             if 'chrimson' in keys[i]:
                 colorPalette[keys[i]] = wes_colors['crimson']
+            if 'tetx' in keys[i]:
+                colorPalette[keys[i]] = wes_colors['eggplant']
+        if 'ms' in keys[i]:
+            if 'w1118' in keys[i]:
+                colorPalette[keys[i]] = wes_colors['black']
+            if 'cas' in keys[i]:
+                colorPalette[keys[i]] = wes_colors['cyan']
         elif 'Sibling' in keys[i]:
             colorPalette[keys[i]] = wes_colors['black']
         elif 'Offspring' in keys[i]:
@@ -208,6 +216,10 @@ def subplotRowColColor(metaDataDf, colorBy, row = None, col = None):
         if 'chrimson' in testGenotypeName or 'csch' in testGenotypeName:
             testGenotypeColor = 'crimson'
         elif 'acr' in testGenotypeName:
+            testGenotypeColor = 'cyan'
+        elif 'tetx' in testGenotypeName:
+            testGenotypeColor = 'eggplant'
+        elif 'cas' and 'ms' in testGenotypeName:
             testGenotypeColor = 'cyan'
     else:
         testGenotypeColor = 'lakeblue'

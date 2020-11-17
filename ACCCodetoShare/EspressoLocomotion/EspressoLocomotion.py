@@ -63,6 +63,7 @@ class EspressoLocomotion(object):
         figure, axes = plt.subplots(nrows=nr + 1, ncols=nc + 1, squeeze = False, figsize=(5 * (nc + 1), 5 * (nr + 1)))
 
         maxYlim = [0]*len(listOfPlots)
+        plotNames=[]
         for i in range(0, len(listOfPlots)):
             print(listOfPlots[i])
             ro, co = listOfPlots[i][0][0:2]
@@ -72,14 +73,15 @@ class EspressoLocomotion(object):
             maxYlim[i] = plt.gca().get_ylim()[1]
             axes[ro, co].set_ylabel('Average Speed (mm/s)')
             axes[ro, co].set_xlabel('Time (hour)')
-            axes[ro, co].legend(custom_palette.keys(), loc = 'upper right')
             axes[ro, co].set_title(name[0]+ ' ' + name[1])
+            plotNames.append([name[-1]])
         for i in range(0, len(listOfPlots)):
             ro, co = listOfPlots[i][0][0:2]
             if YLim:
                 axes[ro, co].set_ylim([0, YLim])
             else:
                 axes[ro, co].set_ylim([0, np.max(maxYlim)])
+        axes[ro, co].legend(plotNames, loc = 'upper right')
         plt.show()
         locoUtilities.espressoSaveFig(figure, 'splitTS', self.metaDataDf.Date[0], self.outputFolder)
 
@@ -89,8 +91,8 @@ class EspressoLocomotion(object):
         resultsDf = self.resultsDf
         resultsDf['newPlotColumn'] = resultsDf[groupBy] + ' ' + resultsDf[compareBy]
 
-        # listIdx = (tuple(np.unique(resultsDf[groupBy])[0]+' '+np.unique(resultsDf[compareBy])[::-1]), tuple(np.unique(resultsDf[groupBy])[1]+' '+np.unique(resultsDf[compareBy])[::-1]))
-        # flatListIdx = [item for t in listIdx for item in t]
+        listIdx = (tuple(np.unique(resultsDf[groupBy])[0]+' '+np.unique(resultsDf[compareBy])[::-1]), tuple(np.unique(resultsDf[groupBy])[1]+' '+np.unique(resultsDf[compareBy])[::-1]))
+        flatListIdx = [item for t in listIdx for item in t]
         customPalette = locoPlotters.espressoCreatePalette(resultsDf[colorBy])
         setFont('Source Sans Bold', 10)
         dabestContrastData = dabest.load(resultsDf,
