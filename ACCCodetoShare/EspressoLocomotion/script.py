@@ -16,32 +16,25 @@ import pandas as pd
 import locoPlotters
 import espresso as esp
 import dabest
+#%%
 
+dataFolder = '/Users/sangyuxu/xy1/'
+TrhLxR50Gal = EspressoLocomotion.EspressoLocomotion(dataFolder, 0, 120)
 
-dataFolderTrhCsCh = '/Users/sangyuxu/xy2/'
-TrhCsCh = EspressoLocomotion.EspressoLocomotion(dataFolderTrhCsCh, 0, 120 )
 
 #%%
 # resultsDf = TrhCsCh.metaDataDf
 
 
 groupBy = 'Temperature'
-compareBy = 'Genotype'
+compareBy = 'Status'
 colorBy = 'Genotype'
-uniqueGroupBy = np.unique(resultsDf[groupBy])
-uniqueCompareBy = np.unique(resultsDf[compareBy])
-listIdx = [tuple(gp + '@' + uniqueCompareBy[::-1]) for gp in uniqueGroupBy]
-# listIdx = (tuple(np.unique(resultsDf[groupBy])[0]+' '+np.unique(resultsDf[compareBy])[::-1]), tuple(np.unique(resultsDf[groupBy])[1]+' '+np.unique(resultsDf[compareBy])[::-1]))
-resultsDf['newPlotColumn'] = resultsDf[groupBy] + '@' + resultsDf[compareBy] 
-dabestContrastData = dabest.load(resultsDf,
-                               x='newPlotColumn', # the default for this test config is to group flies by genotype
-                               y='#Flies',
-                               idx=listIdx,
-                               paired=False
-                              )
-fig = dabestContrastData.mean_diff.plot( color_col=colorBy)
-flatListIdx = [item.split('@')[1] for t in listIdx for item in t] 
-fig.axes[0].set_xticklabels(flatListIdx, rotation = 45, ha="right")
+dabestContrastData = dabest.load(TrhLxR50Gal.resultsDf,
+                       x=compareBy, # the default for this test config is to group flies by genotype
+                       y='averageSpeed'
+                       ,
+                       idx=np.unique(TrhLxR50Gal.metaDataDf.Status),
+                       paired=False
+                      )
 
-diffListIdx = flatListIdx[]
-fig.axes[1].set_xticklabels(flatListIdx, rotation = 45, ha="right")
+fig = dabestContrastData.mean_diff.plot( color_col=colorBy)

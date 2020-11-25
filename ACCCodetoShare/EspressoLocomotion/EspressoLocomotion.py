@@ -18,7 +18,7 @@ from setFont import setFont
 
 class EspressoLocomotion(object):
     def __init__(self, dataFolder, startMin, endMin, initialResamplePeriod = 50, longForm = False):
-        self.version = '0.0.3'
+        self.version = '0.0.4'
         bigMetaDataDf, bigCountLogDf = locoDataMunger.readMetaAndCount(dataFolder, startMin, endMin, initialResamplePeriod, longForm)
         self.metaDataDf = bigMetaDataDf
         self.countLogDf = bigCountLogDf
@@ -63,8 +63,9 @@ class EspressoLocomotion(object):
         figure, axes = plt.subplots(nrows=nr + 1, ncols=nc + 1, squeeze = False, figsize=(5 * (nc + 1), 5 * (nr + 1)))
 
         maxYlim = [0]*len(listOfPlots)
+        plotNames=[]
         for i in range(0, len(listOfPlots)):
-            print(listOfPlots[i])
+            # print(listOfPlots[i])
             ro, co = listOfPlots[i][0][0:2]
             name = listOfPlots[i][1]
             ind = gp[name]
@@ -72,25 +73,28 @@ class EspressoLocomotion(object):
             maxYlim[i] = plt.gca().get_ylim()[1]
             axes[ro, co].set_ylabel('Average Speed (mm/s)')
             axes[ro, co].set_xlabel('Time (hour)')
-            axes[ro, co].legend(custom_palette.keys(), loc = 'upper right')
             axes[ro, co].set_title(name[0]+ ' ' + name[1])
+            plotNames.append([name[-1]])
         for i in range(0, len(listOfPlots)):
             ro, co = listOfPlots[i][0][0:2]
             if YLim:
                 axes[ro, co].set_ylim([0, YLim])
             else:
                 axes[ro, co].set_ylim([0, np.max(maxYlim)])
+        axes[ro, co].legend(plotNames, loc = 'upper right')
         plt.show()
         locoUtilities.espressoSaveFig(figure, 'splitTS', self.metaDataDf.Date[0], self.outputFolder)
 
         return figure,  axes
 
-    def plotContrasts(self, y, colorBy, compareBy, groupBy = 'Temperature'):
+    def plotContrasts(self, y, colorBy, compareBy, groupBy = 'Temperature', plot_kwargs = dict()):
         resultsDf = self.resultsDf
-        resultsDf['newPlotColumn'] = resultsDf[groupBy] + ' ' + resultsDf[compareBy]
-
-        # listIdx = (tuple(np.unique(resultsDf[groupBy])[0]+' '+np.unique(resultsDf[compareBy])[::-1]), tuple(np.unique(resultsDf[groupBy])[1]+' '+np.unique(resultsDf[compareBy])[::-1]))
-        # flatListIdx = [item for t in listIdx for item in t]
+        resultsDf['newPlotColumn'] = resultsDf[groupBy] + '  ' + resultsDf[compareBy]
+        listIdx = tuple(np.unique(resultsDf[groupBy])[0]+'  ' +np.unique(resultsDf[compareBy])[::-1])
+        for i in range(1, len(np.unique(resultsDf[groupBy]))):
+            listIdx = (listIdx, tuple(np.unique(resultsDf[groupBy])[i]+'  '+np.unique(resultsDf[compareBy])[::-1]))
+        
+        print(listIdx)
         customPalette = locoPlotters.espressoCreatePalette(resultsDf[colorBy])
         setFont('Source Sans Bold', 10)
         dabestContrastData = dabest.load(resultsDf,
@@ -100,12 +104,23 @@ class EspressoLocomotion(object):
                                paired=False
                               )
 
-        fig = dabestContrastData.mean_diff.plot( color_col=colorBy, custom_palette = customPalette)
-        flatListIdx = [item.split('@')[1] for t in listIdx for item in t]
-        fig.axes[0].set_xticklabels(flatListIdx, rotation = 45, ha="right")
-
+        fig = dabestContrastData.mean_diff.plot( color_col=colorBy, custom_palette = customPalette, **plot_kwargs)
+        if len(np.unique(resultsDf[groupBy]))==1:
+            flatListIdxC = [item.split('  ')[1] for item in listIdx]
+            flatListIdxG = [item.split('  ')[0] for item in listIdx]
+        else:
+            flatListIdxC = [item.split('  ')[1] for t in listIdx for item in t]
+            flatListIdxG = [item.split('  ')[0] for t in listIdx for item in t]
+        fig.axes[0].set_xticklabels(flatListIdxC, rotation = 45, ha="right")
+        ylim = fig.axes[0].get_ylim()
+        for i in range(0, len(np.unique(resultsDf[groupBy]))):
+            # fig.axes[0].text(0.5, ylim[1], flatListIdxG[0],  ha="center")
+            fig.axes[0].text(0.5 + 2*i, ylim[1]*1.1, flatListIdxG[2*i],  ha="center")
+        locoUtilities.espressoSaveFig(fig, y +'_contrast', self.metaDataDf.Date[0], self.outputFolder)
+        return fig
         # diffListIdx = flatListIdx[]
-        fig.axes[1].set_xticklabels(flatListIdx, rotation = 45, ha="right")
+        
+        # fig.axes[1].set_xticklabels('Diff', rotation = 45, ha="right")
 
     # def saveEspressoLocomotionObj(self):
     #     with open(self.outputFolder + 'locoObj_'+ str(self.startMin) + 'to' + str(self.endMin) + '.pickle', 'wb') as f:
