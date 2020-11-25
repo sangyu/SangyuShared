@@ -35,27 +35,38 @@ def espressoCreatePalette(items, testColor = 'crimson'):
         if 'gal4' in keys[i]:
             if 'w1118' in keys[i]:
                 colorPalette[keys[i]] = wes_colors['black']
+                continue
             if 'acr' in keys[i]:
                 colorPalette[keys[i]] = wes_colors['cyan']
+                continue
             if 'chrimson' in keys[i]:
                 colorPalette[keys[i]] = wes_colors['crimson']
+                continue
             if 'tetx' in keys[i]:
                 colorPalette[keys[i]] = wes_colors['eggplant']
+                continue
         if 'ms' in keys[i]:
             if 'w1118' in keys[i]:
                 colorPalette[keys[i]] = wes_colors['black']
+                continue
             if 'cas' in keys[i]:
                 colorPalette[keys[i]] = wes_colors['cyan']
+                continue
         elif 'Sibling' in keys[i]:
             colorPalette[keys[i]] = wes_colors['black']
+            continue
         elif 'Offspring' in keys[i]:
             colorPalette[keys[i]] = wes_colors[testColor]
+            continue
         elif keys[i] == 'F':
             colorPalette[keys[i]] = wes_colors['hotpink']
+            continue
         elif keys[i] == 'M':
             colorPalette[keys[i]] = wes_colors['lakeblue']
+            continue
         elif keys[i] == 'VF':
             colorPalette[keys[i]] = wes_colors['eggplant']
+            continue
         else:
             colorPalette[keys[i]] = colors[n]
             n += 1
@@ -70,8 +81,8 @@ def espressoPlotTracking(X, Y, flyName, colorPalette):
 
 def espressoPlotHeatmap(X, Y, flyGenotype, colorPalette):
     import matplotlib.colors as mcolors
-    plt.hist2d(X[~np.isnan(X)],Y[~np.isnan(Y)], bins=[12, 20],cmap=plt.cm.bone, range=np.array([(0, 13), (-1, 18)]), norm=mcolors.PowerNorm(0.6))
-#    plt.hist2d(X[~np.isnan(X)],Y[~np.isnan(Y)], bins=[50, 80],cmap=plt.cm.jet, range=np.array([(0, 13), (-1, 18)]))
+    # plt.hist2d(X[~np.isnan(X)],Y[~np.isnan(Y)], bins=[12, 20],cmap=plt.cm.bone, range=np.array([(0, 13), (-1, 18)]), norm=mcolors.PowerNorm(0.6))
+    plt.hist2d(X[~np.isnan(X)],Y[~np.isnan(Y)], bins=[12, 20],cmap=plt.cm.bone, range=np.array([(0, 13), (-1, 18)]))
 
 def espressoPlotMeanHeatmaps(espLocoObj, binSize, row = None, col = None, verbose = False):
     from mpl_toolkits.axes_grid1.inset_locator import inset_axes
@@ -174,7 +185,7 @@ def plotBoundedLine(x, Y, ax=None, c = 'k', resamplePeriod = '200s'):
 
 
 
-def putThingsInToChamberSubplot(countLogDf, metaDataDf, plotFunc = espressoPlotTracking):
+def putThingsInToChamberSubplot(countLogDf, metaDataDf, plotFunc = espressoPlotTracking, showID = True):
     noOfRows=int(np.ceil(len(metaDataDf)/15))
     chamberSmalls, axarr = plt.subplots(noOfRows, 15, figsize = [20, noOfRows*2.5])
     metaDataDf = metaDataDf.reset_index()
@@ -184,12 +195,14 @@ def putThingsInToChamberSubplot(countLogDf, metaDataDf, plotFunc = espressoPlotT
         row = int((id - col)/15)
         chamberSmalls.sca(axarr[row, col])
         colorPalette = espressoCreatePalette(metaDataDf['Genotype'])
-        flyGenotype = metaDataDf['Genotype'][j-1]
+        flyGenotype = metaDataDf['Genotype'][j]
         X = countLogDf.filter(regex = '_X')
         Y = countLogDf.filter(regex = '_Y')
 #        plotFunc(X.iloc[:, j-1], Y.iloc[:, j-1], flyGenotype, colorPalette)
         plotFunc(X.iloc[:, j], Y.iloc[:, j], flyGenotype, colorPalette)
 #        axarr[row, col].set_title(flyGenotype)
+        if showID:
+            plt.title(metaDataDf.loc[j, 'ID'])
     chamberSmalls.suptitle(metaDataDf.loc[0, 'Date'] + ' ' + str(metaDataDf.loc[0, 'Temperature']) )
     for row in range(0, axarr.shape[0]):
         for col in range(0, axarr.shape[1]):

@@ -18,7 +18,7 @@ import espresso as esp
 import dabest
 #%%
 
-dataFolder = '/Users/xusy/Data/Espresso/LexAOpACR/TrhLexAR50H05Gal4TwoStarvedProcessed/'
+dataFolder = '/Users/sangyuxu/xy1/'
 TrhLxR50Gal = EspressoLocomotion.EspressoLocomotion(dataFolder, 0, 120)
 
 
